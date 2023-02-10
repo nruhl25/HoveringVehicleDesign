@@ -1,5 +1,5 @@
 FC = gfortran
-FFLAGS = -O3 -fcheck=all -fbacktrace -g -finit-real=NaN
+FFLAGS = -O3 -Wall -fcheck=all -fbacktrace -g -finit-real=NaN
 SRC = mod_copter.f90 mod_splines.f90 mod_tools.f90 main.f90
 OBJ = ${SRC:.f90=.o}
 
