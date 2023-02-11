@@ -31,10 +31,10 @@ program main
     rho_ssl = 1.22557 ! kg/m^3
     rho_1 = 1.15490 ! kg/m^3
 
-    trad = copter(2.1336, 6, 0.100584, 100.007, 1.20, 1)
-    quad = copter(0.61, 3, 1./6., 350., 1.15, 4)
-    tandem = copter(1.3716, 5, 0.0762, 155., 1.15, 2)
-    hex = copter(0.48768, 4, 0.0381, 350., 1.15, 6)
+    trad = copter(2.1336, 6, 0.100584, 100.007, 1.15, 1)
+    quad = copter(0.61, 3, 1./6., 350., 1.0, 4)
+    tandem = copter(1.3716, 5, 0.0762, 155., 1.0, 2)
+    hex = copter(0.48768, 4, 0.0381, 350., 1.0, 6)
     copter_list = (/trad, quad, tandem, hex/)
     copter_names = (/"Trad", "Quad", "Tand", "Hexa"/)
 
@@ -45,10 +45,16 @@ program main
 
     !!!!!!!!!!! ANALYSIS BELOW !!!!!!!!!!!!!!!
 
-    print*, "Ct/sigma   FM (at SSL)"
+    ! print*, "# Results at Mean Sea Level (2000 ft)"
+    ! print*, "# Ct, FM, Cp, DL [N/m^2], PL [N/W], P_ideal (rotor) [kW], P_single (rotor) [kW], P_total (system) [kW]"
+    ! print*, "# ----------------------------------------------------------------------------------------------------"
+    print*, "# Ct/sigma, FM, DL, PL"
+    print *, "# -------------------"
     do i = 1,4
-        print*, copter_names(i), " results:"
         call analyze_copter(copter_list(i), rho_ssl, fm_sp)
+        ! print*, copter_list(i)%Ct, copter_list(i)%FM, copter_list(i)%Cp, copter_list(i)%DL, & 
+        ! copter_list(i)%PL, copter_list(i)%P_ideal, copter_list(i)%P_single, copter_list(i)%P_tot
+        print*, copter_list(i)%Ct_norm, copter_list(i)%FM, copter_list(i)%DL, copter_list(i)%PL
     enddo
 
     contains
@@ -58,21 +64,25 @@ program main
         real(wp), intent(in) :: rho    ! density
         type(spline), intent(in) :: fm_sp
 
-        real(wp) :: Ar, Tr, Ct, sigma, Ct_norm, FM, Cp, PL, DL
+        real(wp) :: Ar, Tr, Ct, sigma, Ct_norm, FM, Cp, PL, DL, P_ideal, P_single, P_tot, q_inf_v, Cp_ideal
 
         ! Calculate Tr, Ct, Ct_norm, FM for single rotor
         Ar = pi*heli%R**2
         Tr = Tt/heli%Nr
-        Ct = Tr/(0.5*Ar*rho*(heli%Omega*heli%R)**2)
+        Ct = Tr/(Ar*rho*(heli%Omega*heli%R)**2.)
         sigma = heli%Nb*heli%chord*heli%R/Ar
         Ct_norm = Ct/sigma
         FM = fm_sp%value(Ct_norm)
 
-        ! Calculate PL, DL for single rotor
-        Cp = Ct**(3./2.)/(sqrt(2.)*FM)
-        PL = Ct/(heli%Omega*heli%R*Cp)   ! ADD IN EXTRA POWER HERE ??
-        DL = Tr/Ar
-
+        ! Calculate PL, DL for single rotor (add 5% for inneficiency of power conversion)
+        q_inf_v = rho*Ar*(heli%Omega*heli%R)**3.
+        Cp_ideal = Ct**(3./2.)/sqrt(2.)
+        Cp = Cp_ideal/FM
+        PL = Ct/(heli%Omega*heli%R*Cp)  ! N/W
+        DL = Tr/Ar  ! N/m^2
+        P_ideal = Cp_ideal*q_inf_v/1000.
+        P_single = Cp*q_inf_v/1000.   ! kW
+        P_tot = (1./0.95)*heli%P_extra*(heli%Nr*P_single)   ! kW
 
         ! Add attributes to the copter object (add to zero)
         heli%sigma = heli%sigma + sigma
@@ -82,8 +92,9 @@ program main
         heli%Cp = heli%Cp + Cp
         heli%PL = heli%PL + PL
         heli%DL = heli%DL + DL
-
-        print*, heli%Ct_norm, heli%FM, heli%PL, heli%DL
+        heli%P_tot = heli%P_tot + P_tot
+        heli%P_ideal = heli%P_ideal + P_ideal
+        heli%P_single = heli%P_single + P_single
 
     end subroutine analyze_copter
 
