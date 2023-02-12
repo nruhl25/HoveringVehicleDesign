@@ -32,7 +32,7 @@ program main
     rho_1 = 1.15490 ! kg/m^3
 
     trad = copter(2.1336, 6, 0.100584, 100.007, 1.15, 1)
-    quad = copter(0.61, 3, 1./6., 350., 1.0, 4)
+    quad = copter(0.61, 3, 0.0508, 350., 1.0, 4)
     tandem = copter(1.3716, 5, 0.0762, 155., 1.0, 2)
     hex = copter(0.48768, 4, 0.0381, 350., 1.0, 6)
     copter_list = (/trad, quad, tandem, hex/)
@@ -45,16 +45,21 @@ program main
 
     !!!!!!!!!!! ANALYSIS BELOW !!!!!!!!!!!!!!!
 
+    ! CODE FOR 'RESULTS'
     ! print*, "# Results at Mean Sea Level (2000 ft)"
-    ! print*, "# Ct, FM, Cp, DL [N/m^2], PL [N/W], P_ideal (rotor) [kW], P_single (rotor) [kW], P_total (system) [kW]"
-    ! print*, "# ----------------------------------------------------------------------------------------------------"
-    print*, "# Ct/sigma, FM, DL, PL"
-    print *, "# -------------------"
+    ! print*, "# Ct_norm, FM, Cp, DL [N/m^2], PL [N/W], P_ideal (rotor) [kW], P_single (rotor) [kW], P_total (system) [kW]"
+    ! print*, "#---------------------------------------------------------------------------------------"
+    ! print*, copter_list(i)%Ct_norm, copter_list(i)%FM, copter_list(i)%Cp, copter_list(i)%DL, & 
+    ! copter_list(i)%PL, copter_list(i)%P_ideal, copter_list(i)%P_single, copter_list(i)%P_tot
+
+    ! CODE FOR 'PERFORMACE'
+    ! print*, "# Ct/sigma, FM, DL, PL"
+    ! print *, "# -------------------"
+    ! print*, copter_list(i)%Ct_norm, copter_list(i)%FM, copter_list(i)%DL, copter_list(i)%PL
+
     do i = 1,4
         call analyze_copter(copter_list(i), rho_ssl, fm_sp)
-        ! print*, copter_list(i)%Ct, copter_list(i)%FM, copter_list(i)%Cp, copter_list(i)%DL, & 
-        ! copter_list(i)%PL, copter_list(i)%P_ideal, copter_list(i)%P_single, copter_list(i)%P_tot
-        print*, copter_list(i)%Ct_norm, copter_list(i)%FM, copter_list(i)%DL, copter_list(i)%PL
+        print*, copter_list(i)%Ct**(3./2.)/copter_list(i)%sigma, copter_list(i)%FM
     enddo
 
     contains
