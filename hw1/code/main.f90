@@ -90,16 +90,16 @@ program main
         P_tot = (1./0.95)*heli%P_extra*(heli%Nr*P_single)   ! kW
 
         ! Add attributes to the copter object (add to zero)
-        heli%sigma = heli%sigma + sigma
-        heli%Ct = heli%Ct + Ct
-        heli%Ct_norm = heli%Ct_norm + Ct_norm
-        heli%FM = heli%FM + FM
-        heli%Cp = heli%Cp + Cp
-        heli%PL = heli%PL + PL
-        heli%DL = heli%DL + DL
-        heli%P_tot = heli%P_tot + P_tot
-        heli%P_ideal = heli%P_ideal + P_ideal
-        heli%P_single = heli%P_single + P_single
+        heli%sigma = sigma
+        heli%Ct = Ct
+        heli%Ct_norm = Ct_norm
+        heli%FM = FM
+        heli%Cp = Cp
+        heli%PL = PL
+        heli%DL = DL
+        heli%P_tot = P_tot
+        heli%P_ideal = P_ideal
+        heli%P_single = P_single
 
     end subroutine analyze_copter
 
