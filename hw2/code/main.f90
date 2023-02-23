@@ -1,60 +1,45 @@
-module subs
-implicit none
-
-contains
-real function f(lambda, C_T, mu, alpha)
-    real, intent(in) :: lambda, C_T, mu, alpha
-    f = lambda - mu*tan(alpha) - C_T/(2.*sqrt(mu**2+lambda**2))
-end function f
-
-real function fprime(lambda, C_T, mu, alpha)
-    real, intent(in) :: lambda, C_T, mu, alpha
-    fprime = 1 + (C_T/2.)*(mu**2+lambda**2)**(-3./2.)*lambda
-end function fprime
-
-end module subs
-
 program main
     use, intrinsic :: iso_fortran_env ! real64
-    use mod_tools, only: wp, pi, linspace, plot2, plotN
-    use subs, only: f, fprime
+    use mod_tools, only: pi, linspace
+    use mod_hw2, only: f, fprime
     implicit none
 
-    real, parameter :: T = 445.         ! [N]
-    real, parameter :: rho = 1.22557    ! [kg/m^3]
-    real, parameter :: vtip1 = 121.92   ! [m/s]
-    real, parameter :: vtip2 = 160.02   ! [m/s]
-    real, parameter :: R = 1.524/2.0    ! [m] blade radius
-    real, parameter :: A = pi*R**2.      ! [m^2] rotor disc area
-    integer, parameter :: N = 10        ! Number of of vtip to sample
-    real, parameter :: tol = 0.0005     ! Tolerance for Newton-Raphson
+    real, parameter :: T = 100.04      ! [lbf]
+    real, parameter :: rho = 0.002378  ! [slug/ft^3]
+    real, parameter :: vtip1 = 400.0   ! [ft/s]
+    real, parameter :: vtip2 = 525.0   ! [ft/s]
+    real, parameter :: R = 2.5         ! [ft] blade radius
+    real, parameter :: A = pi*R**2.    ! [ft^2] rotor disc area
+    integer, parameter :: N = 50       ! Number of of vtip to sample
+    real, parameter :: tol = 0.0005    ! Tolerance for Newton-Raphson
 
     ! Declare variables
     real :: alpha      ! incidence angle (rad)
-    real :: v_inf      ! [m/s] tunnel air speed
-    real, dimension(N) :: vtip_list, mu, C_T, v_h
-    real, dimension(N) :: lambda, lambda_i, lambda_h, P, P_h      ! OUTPUTS OF PROGRAM
+    real :: C_T, v_h, P_h, lambda_h
+    real, dimension(N) :: v_inf, mu, lambda, lambda_i, P
     integer :: i
 
     ! Define variables
-    alpha = 10.*pi/180.
-    v_inf = 25.722222   ! 50 knots
+    alpha = 0.*pi/180.
 
-    ! Depend on alpha, v_inf
-    call linspace(vtip_list, vtip1, vtip2, N)
-    mu = v_inf*cos(alpha)/vtip_list
-    C_T = T/(rho*A*(vtip_list)**2.)
+    ! Arrays
+    call linspace(v_inf, 0.0, 84.3905, N)
+    mu = v_inf*cos(alpha)/vtip1
+
+    ! Scalars
+    C_T = T/(rho*A*(vtip1)**2.)
     lambda_h = sqrt(C_T/2.)
-    v_h = lambda_h*vtip_list
+    v_h = lambda_h*vtip1
     P_h = T*v_h
 
-    ! Fill in lambda, lambda_i, P, P_h arrays
+    ! Fill in lambda, lambda_i, and P arrays
+    print*, 'alpha=0 deg'
+    print*, '# v_inf, v_i, P'
     do i=1,N
-        lambda(i) = calc_lambda(alpha, v_inf, vtip_list(i))
-
+        lambda(i) = calc_lambda(alpha, v_inf(i), vtip1)
         lambda_i(i) = lambda(i) - mu(i)*tan(alpha)
-        P(i) = P_h(i)*((mu(i)/lambda_h(i))*tan(alpha) + (lambda_h(i)/sqrt(mu(i)**2+lambda(i)**2)))
-        print*, mu(i)/lambda_h(i), lambda(i)/lambda_h(i), P(i)/P_h(i)
+        P(i) = P_h*((mu(i)/lambda_h)*tan(alpha) + (lambda_h/sqrt(mu(i)**2+lambda(i)**2)))
+        print*, v_inf(i), vtip1*lambda_i(i), P(i)
     end do
 
     contains

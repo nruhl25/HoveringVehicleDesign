@@ -1,6 +1,6 @@
 FC = gfortran
 FFLAGS = -O3 -Wall -fcheck=all -fbacktrace -g -finit-real=NaN
-SRC = mod_tools.f90 main.f90
+SRC = mod_hw2.f90 mod_tools.f90 main.f90
 OBJ = ${SRC:.f90=.o}
 
 %.o: %.f90
