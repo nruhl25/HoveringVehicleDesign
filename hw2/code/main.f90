@@ -26,7 +26,7 @@ program main
     call linspace(v_inf, 0.0, 84.3905, N)
     mu = v_inf*cos(alpha)/vtip1
 
-    ! Scalars
+    ! Scalars dependenant on vtip
     C_T = T/(rho*A*(vtip1)**2.)
     lambda_h = sqrt(C_T/2.)
     v_h = lambda_h*vtip1
@@ -55,6 +55,9 @@ program main
         integer :: num_iter
 
         mu = v_inf*cos(alpha)/vtip
+
+        ! Note for my future self: the values below could be accesed from the main program scope,
+        ! but are re-defined here
         C_T = T/(rho*A*vtip**2.)
         lambda_h = sqrt(C_T/2.)
         v_h = lambda_h*vtip
