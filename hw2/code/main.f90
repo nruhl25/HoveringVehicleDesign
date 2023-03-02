@@ -6,7 +6,7 @@ program main
 
     real, parameter :: T = 100.04      ! [lbf]
     real, parameter :: rho = 0.002378  ! [slug/ft^3]
-    real, parameter :: vtip1 = 525.0 ! 400.0   ! [ft/s]
+    real, parameter :: vtip1 = 400.0   ! [ft/s]
     real, parameter :: vtip2 = 525.0   ! [ft/s]
     real, parameter :: R = 2.5         ! [ft] blade radius
     real, parameter :: A = pi*R**2.    ! [ft^2] rotor disc area
@@ -33,20 +33,13 @@ program main
     P_h = T*v_h
 
     ! Fill in lambda, lambda_i, and P arrays
-    !print*, 'alpha=-10 deg'
-    !print*, '# v_inf, v_i, P'
     do i=1,N
         lambda(i) = calc_lambda(alpha, v_inf(i), vtip1)
         lambda_i(i) = lambda(i) - mu(i)*tan(alpha)
         P(i) = P_h*((mu(i)/lambda_h)*tan(alpha) + (lambda_h/sqrt(mu(i)**2+lambda(i)**2)))
         v_i(i) = vtip1*lambda_i(i)
-        !print*, v_inf(i), vtip1*lambda_i(i), P(i)
-    end do
-
-    v_net = v_inf*cos((pi/2)+alpha) - v_i
-
-    do i=1,N
-        print*, v_inf(i), v_net(i)
+        v_net(i) = lambda(i)*vtip1
+        print*, v_inf(i), P(i)/P_h
     end do
 
 
