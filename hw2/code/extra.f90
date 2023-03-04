@@ -17,13 +17,14 @@ program extra
     call linspace(v_inf, 0.0, 84.3905, N_vinf)
     call linspace(vtip, vtip1, vtip2, N_vtip)
 
-    do i=1,N_vtip
-        do j=1,N_vinf
-            lambda(i,j) = calc_lambda(alpha, v_inf(j), vtip(i))
-            print*, v_inf(j), lambda(i,j)
-        enddo
-        print*,''
-        print*,''
-    enddo
+    ! do i=1,N_vtip
+    !     do j=1,N_vinf
+    !         lambda(i,j) = calc_lambda(alpha, v_inf(j), vtip(i))
+    !         print*, v_inf(j), lambda(i,j)
+    !     enddo
+    !     print*,''
+    !     print*,''
+    ! enddo
+    print *, vtip
 
 end program extra
