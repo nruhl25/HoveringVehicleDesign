@@ -10,7 +10,9 @@ from Rotor2 import Rotor2
 # Constants
 rho0 = 0.002378 # slug/ft^3
 
-#### These functions could be methods in the rotor2 class, but I don't want to make it too complicated so I'll keep them here
+# The functions below describe the linear variations of the rotor2 properties.
+# They could be methods in the Rotor2 class, but I will keep them here to keep the Rotor2 class simple
+#######################
 def Cl_slope(r, rotor2):
     '''cl_slope as a function of r, rotor2 object'''
     cl_slope = rotor2.cl_slope_75 + rotor2.AV*(r-0.75)
@@ -33,9 +35,9 @@ def Sigma(r, rotor2):
         '''Rotor solidity as a function of r changes because of taper'''
         sigma = rotor2.Nb*Chord(r, rotor2)/(np.pi*rotor2.R)
         return sigma
-####
+####################
 
-### BEMT functions ###
+###### BEMT functions ######
 
 def Lambda(r, rotor2, F=1):
     '''Inflow ratio as a function of non-dimensional radius, rotor2 object, Prandtl tip loss factor'''
@@ -89,7 +91,6 @@ def calcF(r, rotor2):
         F = Ff(r, lmbda, rotor2)
         error = np.abs(F-Flast)
         num_iter += 1
-    print(f"F={F}")
     return F
 
 # Testing
