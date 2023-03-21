@@ -36,12 +36,7 @@ def dCP(r, theta_75, rotor):
     return 4*Lambda(r, theta_75, rotor)**3*r
 
 def calc_CT_CP(theta_75, rotor):
-    '''Calculate total coefficients CT and CP for a given rotor object'''
-    N = 10
-    rs, w = gaussxwab(N, 0.0001, 1)
-    CT = 0
-    CP = 0
-    for i in range(N):
-        CT += w[i]*dCT(rs[i], theta_75, rotor)
-        CP += w[i]*dCP(rs[i], theta_75, rotor)
+    '''Calculate total coefficients CT and CP for a given rotor object. This function makes used of the fact the Lambda is not a function of r, and uses r=1 to define the inflow (I originally made this function like this when it involved numerical integration)'''
+    CT = 2*Lambda(1, theta_75, rotor)**2
+    CP = 2*Lambda(1, theta_75, rotor)**3
     return CT, CP

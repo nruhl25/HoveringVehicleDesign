@@ -1,5 +1,5 @@
 # Author: Nathaniel Ruhl
-# MEAM 5460 HW3
+# MEAM 5460 Project 1
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,9 +26,9 @@ def Theta(r, rotor2):
 def Chord(r, rotor2):
     '''Linear chord variation as a function of r
     INPUTS:
-    TR = taper ratio (eg 2 for 2:1)
+    TR = taper ratio (eg -0.5 for 2:1)
     c_75: chord at 75%R'''
-    chord = (1/rotor2.TR)*(r-0.75)+rotor2.chord_75
+    chord = rotor2.chord_75+rotor2.TR*(r-0.75)
     return chord
 
 def Sigma(r, rotor2):
@@ -84,6 +84,7 @@ def Ff(r, lmbda, rotor2):
 def calcF(r, rotor2):
     F = 1
     error = 100
+    tol = 1e-6
     num_iter = 0
     while(error > tol):
         Flast = F
@@ -92,46 +93,6 @@ def calcF(r, rotor2):
         error = np.abs(F-Flast)
         num_iter += 1
     return F
-
-# Testing
-
-rotor2 = Rotor2()
-rotor2.Nb=1
-rotor2.theta_tw=0 # UNTWISTED BLADE!! (page 144)
-tol = 1e-6
-rs = np.linspace(0,0.99,100)
-F_list = np.zeros(100)
-lambda_list = np.zeros(100)
-dCT_list = np.zeros(100)
-for i in range(len(rs)):
-    F = calcF(rs[i], rotor2)
-    F_list[i] = F
-    lambda_list[i] = Lambda(rs[i], rotor2, F)
-    dCT_list[i] = dCT(rs[i], rotor2, F)
-
-plt.figure(1)
-plt.plot(rs, F_list)
-plt.grid()
-plt.xlim([0.7,1])
-plt.xlabel('r')
-plt.ylabel('F')
-
-plt.figure(2)
-plt.plot(rs, lambda_list, label="With Prandtl tip loss")
-plt.plot(rs, Lambda(rs, rotor2, F=1), label="No tip loss")
-plt.grid()
-plt.xlabel('r')
-plt.ylabel(r'$\lambda$')
-plt.legend()
-
-plt.figure(3)
-plt.plot(rs, dCT_list, label="With Prandtl tip loss")
-plt.plot(rs, dCT(rs, rotor2, F=1), label="No tip loss")
-plt.grid()
-plt.xlabel('r')
-plt.ylabel(r'$c_T$')
-plt.legend()
-plt.show()
 
 # rotor2 = Rotor2()
 

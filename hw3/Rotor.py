@@ -3,7 +3,7 @@ import numpy as np
 class Rotor:
     '''Rotor object with default test rotor for hw3'''
     def __init__(self):
-        self._Nb = 1  # number of blades
+        self._Nb = 3  # number of blades
         self._c = 2.0  # Chord length, ft
         self._R = 30  # ft
         self._vtip = 650  # ft/sec

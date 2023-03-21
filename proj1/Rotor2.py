@@ -3,18 +3,19 @@ import numpy as np
 class Rotor2:
     '''Rotor2 object with default test rotor for hw3'''
     def __init__(self):
-        self._Nb = 1  # number of blades
+        self._Nb = 3  # number of blades
         self._R = 30  # ft
         self._vtip = 780  # ft/sec
 
         # Coefficient properties related to linear radial variations of airfoil cl_slope, theta twist, and chord
-        self._AV = 4*np.pi
-        self._cl_slope_75 = 5*np.pi
 
         self._theta_tw = -np.deg2rad(8)
         self._theta_75 = np.deg2rad(5)
 
-        self._TR = 2
+        self._AV = 0
+        self._cl_slope_75 = 2*np.pi
+
+        self._TR = 0
         self._chord_75 = 2  # ft
 
     @property
