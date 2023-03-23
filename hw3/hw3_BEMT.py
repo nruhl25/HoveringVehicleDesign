@@ -3,8 +3,6 @@
 
 import numpy as np
 
-from gaussxw import gaussxwab
-
 # Constants
 rho0 = 0.002378 # slug/ft^3
 
@@ -40,3 +38,8 @@ def calc_CT_CP(theta_75, rotor):
     CT = 2*Lambda(1, theta_75, rotor)**2
     CP = 2*Lambda(1, theta_75, rotor)**3
     return CT, CP
+
+def CP0(rotor):
+    '''Profile power coefficient'''
+    CP0 = (1/8)*rotor.sigma*rotor.cd0
+    return CP0

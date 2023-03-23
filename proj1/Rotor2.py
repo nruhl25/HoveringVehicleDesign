@@ -6,6 +6,7 @@ class Rotor2:
         self._Nb = 3  # number of blades
         self._R = 30  # ft
         self._vtip = 780  # ft/sec
+        self._cd0 = 0.01
 
         # Coefficient properties related to linear radial variations of airfoil cl_slope, theta twist, and chord
 
@@ -29,6 +30,10 @@ class Rotor2:
     @property
     def vtip(self):
         return self._vtip
+    
+    @property
+    def cd0(self):
+        return self._cd0
     
     @property
     def AV(self):
@@ -65,6 +70,10 @@ class Rotor2:
     @vtip.setter
     def vtip(self, val):
         self._vtip = val
+
+    @cd0.setter
+    def cd0(self, val):
+        self._cd0 = val
 
     @AV.setter
     def AV(self, val):

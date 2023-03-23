@@ -59,20 +59,20 @@ def dCT(r, rotor2, F=1):
     '''Local blade coefficient of thrust as a function of non-dimensional radius r, rotor2 object, F: Prandtl tip loss factor'''
     return 4*F*Lambda(r, rotor2, F)**2*r
 
-def dCP(r, rotor2, F=1):
+def dCPi(r, rotor2, F=1):
     '''Local blade coefficient of power as a function of non-dimensional radius r, rotor2 object, F: Prandtl tip loss factor'''
     return 4*F*Lambda(r, rotor2, F)**3*r
 
-def calc_CT_CP(rotor2):
+def calc_CT_CPi(rotor2):
     '''Calculate total coefficients CT and CP for a given rotor2 object'''
     N = 10
     rs, w = gaussxwab(N, 0, 1)
     CT = 0
-    CP = 0
+    CPi = 0
     for i in range(N):
         CT += w[i]*dCT(rs[i], rotor2)
-        CP += w[i]*dCP(rs[i], rotor2)
-    return CT, CP
+        CPi += w[i]*dCPi(rs[i], rotor2)
+    return CT, CPi
 
 def Ff(r, lmbda, rotor2):
     '''Prandtl tip loss factor as a function of non-dimensional radius and inflow.

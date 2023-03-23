@@ -9,6 +9,7 @@ class Rotor:
         self._vtip = 650  # ft/sec
         self._cl_slope = 2*np.pi
         self._sigma = self._Nb*self._c/(np.pi*self._R)
+        self._cd0 = 0.01
 
     @property
     def Nb(self):
@@ -33,6 +34,10 @@ class Rotor:
     @property
     def sigma(self):
         return self._Nb*self._c/(np.pi*self._R)
+    
+    @property
+    def cd0(self):
+        return self._cd0
 
     @Nb.setter
     def Nb(self, val):
