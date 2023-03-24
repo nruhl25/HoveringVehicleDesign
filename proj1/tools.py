@@ -1,134 +1,66 @@
-# Varioius tools for proj1
+# Varioius tools for proj1 that interfrac with BEMT2
 import matplotlib.pyplot as plt
 import numpy as np
-from BEMT2 import Cl_slope, Theta, Chord, Sigma
 
+from gaussxw import gaussxwab
 # functions related to linear blade property variations
 from BEMT2 import Cl_slope, Theta, Chord, Sigma
 # BEMT functions
-from BEMT2 import Lambda, Alpha, dCT, dCPi, dCP0_NACA0012, dCP0_GENERAL, calc_CT_CPi_CP0, calcF
+from BEMT2 import Lambda, Alpha, dCT, dCPi, dCP0_NACA0012, dCP0_GENERAL, calcF
 
-def plot_rotor2(rotor2):
-    '''Function to plot rotor2 spec'''
-    # Non-dimensional radius
-    rs = np.linspace(0, 1, 100)
+def calc_rotor_profiles(rotor2, airfoil, use_F=False, rs=np.linspace(0.1, 0.99, 100)):
+    '''This function is an interface to calculating performance profiless (default: no tip losses)'''
+    # Choose method of calculating profile drag
+    if airfoil == "GENERAL":
+        dCP0_func = lambda r, rotor, Ff: dCP0_GENERAL(r, rotor, Ff)
+    elif airfoil == "NACA0012":
+        dCP0_func = lambda r, rotor, Ff: dCP0_NACA0012(r, rotor, Ff)
+    else:
+        dCP0_func = lambda x: x 
+        raise RuntimeError(
+            "User entered arguments are not valid. Must be either 'GENERAL' or 'NACA0012'")
+    
+    if use_F is False:
+        F_list = np.ones(len(rs))
+        lambda_list = Lambda(rs, rotor2, F=1)
+        dCT_list = dCT(rs, rotor2, F=1)
+        dCPi_list = dCPi(rs, rotor2, F=1)
+        dCP0_list = dCP0_func(rs, rotor2, F=1)
+    elif use_F is True:
+        # Using Prandtl tip loss, cannot make use of vectorization
+        F_list = np.zeros(len(rs))
+        lambda_list = np.zeros(len(rs))
+        dCT_list = np.zeros(len(rs))
+        dCPi_list = np.zeros(len(rs))
+        dCP0_list = np.zeros(len(rs))
+        for i in range(len(rs)):
+            F = calcF(rs[i], rotor2)
+            F_list[i] = F
+            lambda_list[i] = Lambda(rs[i], rotor2, F)
+            dCT_list[i] = dCT(rs[i], rotor2, F)
+            dCPi_list[i] = dCPi(rs[i], rotor2, F)
+            dCP0_list[i] = dCP0_func(rs[i], rotor2, F)
+    
+    return lambda_list, dCT_list, dCPi_list, dCP0_list, F_list
 
-    plt.rcParams['figure.figsize'] = [14, 5]
+def calc_CT_CPi_CP0(rotor2, airfoil="GENERAL", use_F=False):
+    '''Calculate total coefficients CT, induced CP, CP0 profile for a given rotor2 object (default: no tip losses)'''
+    if airfoil == "GENERAL":
+        def dCP0_func(r, rotor, Ff): return dCP0_GENERAL(r, rotor, Ff)
+    elif airfoil == "NACA0012":
+        def dCP0_func(r, rotor, Ff): return dCP0_NACA0012(r, rotor, Ff)
+    else:
+        raise RuntimeError(
+            "User entered arguments are not valid. Must be either None (default) or 'NACA0012'")
 
-    plt.subplot(1, 4, 1)
-    plt.title("Blade Twist")
-    plt.ylabel(r"$\theta(r)$ (deg)")
-    plt.xlabel("r")
-    plt.plot(rs, np.rad2deg(Theta(rs, rotor2)))
-    plt.grid()
-
-    plt.subplot(1, 4, 2)
-    plt.title("Lift-Curve Slope")
-    plt.ylabel(r"$c_{l,\alpha}(r)$")
-    plt.xlabel("r")
-    plt.plot(rs, Cl_slope(rs, rotor2))
-    plt.grid()
-
-    plt.subplot(1, 4, 3)
-    plt.title("Chord")
-    plt.ylabel("c(r) (ft)")
-    plt.xlabel("r")
-    plt.plot(rs, Chord(rs, rotor2))
-    plt.grid()
-
-    plt.subplot(1, 4, 4)
-    plt.title("Local Rotor Solidity")
-    plt.ylabel(r"$\sigma(r)$")
-    plt.xlabel("r")
-    plt.plot(rs, Sigma(rs, rotor2))
-    plt.grid()
-
-    plt.tight_layout()
-    plt.show()
-    print(f"Other rotor2 properties: Nb={rotor2.Nb}, R={rotor2.R} ft, vtip = {rotor2.vtip} ft/sec, cd0={rotor2.cd0}")
-    plt.rcParams['figure.figsize'] = [6.4, 4.8]   # default
-    return
-
-# If F_toggle=True, do the loop through r to calculate the section profiles (function with "if statement"). If F_toggle=False, we allow vectorization
-def plot_prandtl_comparison(rotor2):
-    rs = np.linspace(0.1, 0.99, 100)
-
-    F_list = np.zeros(100)
-    lambda_list = np.zeros(100)
-    dCT_list = np.zeros(100)
-    dCPi_list = np.zeros(100)
-    for i in range(len(rs)):
+    N = 10
+    rs, w = gaussxwab(N, 0, 1)
+    CT = 0
+    CPi = 0
+    CP0 = 0
+    for i in range(N):
         F = calcF(rs[i], rotor2)
-        F_list[i] = F
-        lambda_list[i] = Lambda(rs[i], rotor2, F)
-        dCT_list[i] = dCT(rs[i], rotor2, F)
-        dCPi_list[i] = dCPi(rs[i], rotor2, F)
-
-    plt.figure()
-    plt.title("Prandtl Tip Loss Function")
-    plt.plot(rs, F_list)
-    plt.grid()
-    plt.xlim([0.7, 1])
-    plt.xlabel('r')
-    plt.ylabel('F')
-
-    plt.figure()
-    plt.title("Inflow Ratio Distribution")
-    plt.plot(rs, lambda_list, label="With tip losses")
-    plt.plot(rs, Lambda(rs, rotor2, F=1), label="Without tip loss")
-    plt.grid()
-    plt.xlabel('r')
-    plt.ylabel(r'$\lambda$')
-    plt.legend()
-
-    plt.figure()
-    plt.title("Section Thrust Coefficient Distribution")
-    plt.plot(rs, dCT_list, label="With Prandtl tip loss")
-    plt.plot(rs, dCT(rs, rotor2, F=1), label="No tip loss")
-    plt.grid()
-    plt.xlabel('r')
-    plt.ylabel(r'$c_T$')
-    plt.legend()
-    plt.tight_layout()
-
-    plt.figure()
-    plt.title("Section Induced Power Coefficient Distribution")
-    plt.plot(rs, dCPi_list, label="With Prandtl tip loss")
-    plt.plot(rs, dCPi(rs, rotor2, F=1), label="No tip loss")
-    plt.grid()
-    plt.xlabel('r')
-    plt.ylabel(r'$c_{P,i}$')
-    plt.legend()
-    plt.show()
-    return
-
-def plot_NACA0012_drag_effects(rotor2):
-    rs = np.linspace(0.1, 0.99, 100)
-
-    plt.figure()
-    plt.title("AoA Distrution across rotor radius")
-    plt.plot(rs, np.rad2deg(Alpha(rs, rotor2)))
-    plt.ylabel(r"Section AoA, $\alpha$ (deg)")
-    plt.xlabel("r")
-    plt.grid()
-
-    plt.figure()
-    plt.title("Section Power Coefficients")
-    plt.plot(rs, dCP0_NACA0012(rs, rotor2), label="Profile (NACA0012)")
-    plt.plot(rs, dCP0_GENERAL(rs, rotor2), label="Profile (GENERAL)")
-    plt.plot(rs, dCPi(rs, rotor2), label="Induced Power")
-    plt.ylabel("Section Power Coefficients across rotor radius")
-    plt.xlabel("r")
-    plt.legend()
-    plt.grid()
-
-    plt.show()
-
-    CT, CPi, CP0 = calc_CT_CPi_CP0(rotor2, airfoil="NACA0012")
-    print(
-        f"NACA0012 airfoils: Profile contribution to total power = {(CP0/(CPi+CP0)):.3f}")
-
-    CT, CPi, CP0 = calc_CT_CPi_CP0(rotor2, airfoil="GENERAL")
-    print(
-        f"GENERAL airfoil: Profile contribution to total power = {(CP0/(CPi+CP0)):.3f}")
-    return
+        CT += w[i]*dCT(rs[i], rotor2, F)
+        CPi += w[i]*dCPi(rs[i], rotor2, F)
+        CP0 += dCP0_func(rs[i], rotor2, F)
+    return CT, CPi, CP0

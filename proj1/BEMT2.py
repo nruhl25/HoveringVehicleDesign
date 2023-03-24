@@ -75,25 +75,6 @@ def dCP0_NACA0012(r, rotor2, F=1):
     '''Differential expression for profile drag coefficient integral when NACA0012 is used (default: no tip losses)'''
     return (1/2)*dCd(Alpha(r, rotor2, F), rotor2)*Sigma(r, rotor2)*r**3
 
-def calc_CT_CPi_CP0(rotor2, F=1, airfoil="GENERAL"):
-    '''Calculate total coefficients CT, induced CP, CP0 profile for a given rotor2 object (default: no tip losses)'''
-    N = 10
-    rs, w = gaussxwab(N, 0, 1)
-    CT = 0
-    CPi = 0
-    CP0 = 0
-    for i in range(N):
-        CT += w[i]*dCT(rs[i], rotor2, F)
-        CPi += w[i]*dCPi(rs[i], rotor2, F)
-
-        if airfoil=="GENERAL":
-            CP0 += w[i]*dCP0_GENERAL(rs[i], rotor2, F)
-        elif airfoil=="NACA0012":
-            CP0 += w[i]*dCP0_NACA0012(rs[i], rotor2, F)
-        else:
-            raise RuntimeError("User entered arguments are not valid. Must be either None (default) or 'NACA0012'")
-    return CT, CPi, CP0
-
 def Ff(r, lmbda, rotor2):
     '''Prandtl tip loss factor as a function of non-dimensional radius and inflow.
     Functioin used in the iterative method calcF(r, lmbda, rotors)'''
@@ -113,22 +94,3 @@ def calcF(r, rotor2):
         error = np.abs(F-Flast)
         num_iter += 1
     return F
-
-# rotor2 = Rotor2()
-# each rotor can have this (recall hw1 results), then comparison of 4 rotors
-
-# theta75_list = np.deg2rad(np.array([3,6,9]))
-# CT, CP = calc_CT_CP(rotor2)
-# rs = np.linspace(0, 1, 100)  # Non-dimensional blade radius
-# for theta75 in theta75_list:
-#     rotor2.theta_75 = theta75
-#     plt.figure(1)
-#     plt.plot(rs, Lambda(rs, rotor2), label=fr"$\theta_{{75}}$={np.rad2deg(rotor2.theta_75):.1f}$^\circ$")
-
-# plt.figure(1)
-# plt.title("Inflow Distribution")
-# plt.xlabel("Non-dimensional radial position, r")
-# plt.ylabel(r"Local Inflow Ratio, $\lambda(r)$")
-# plt.grid()
-# plt.legend()
-# plt.show()

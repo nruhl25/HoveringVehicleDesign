@@ -94,3 +94,7 @@ class Rotor2:
     @chord_75.setter
     def chord_75(self, val):
         self._chord_75 = val
+
+    # Anonymous setter function, property ='_TR', etc...
+    def setProperty(self, property, val):
+        self.__dict__[property] = val
