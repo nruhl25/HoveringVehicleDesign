@@ -6,7 +6,6 @@ class Rotor2:
         self._Nb = 3  # number of blades
         self._R = 30  # ft
         self._vtip = 780  # ft/sec
-        self._cd0 = 0.01
 
         # Coefficient properties related to linear radial variations of airfoil cl_slope, theta twist, and chord
 
@@ -19,6 +18,11 @@ class Rotor2:
         self._TR = 0
         self._chord_75 = 2  # ft
 
+        # INSTANCE VARIABLES BELOW (can't set them... yet)
+        self.cd0 = 0.01   # constant cd for simplified model
+        # Coeffcients from quadratic cd fit (NACA0012.py)
+        self.d = [0.01283799, -0.07514892, 0.68085794]
+
     @property
     def Nb(self):
         return self._Nb
@@ -30,10 +34,6 @@ class Rotor2:
     @property
     def vtip(self):
         return self._vtip
-    
-    @property
-    def cd0(self):
-        return self._cd0
     
     @property
     def AV(self):
@@ -70,10 +70,6 @@ class Rotor2:
     @vtip.setter
     def vtip(self, val):
         self._vtip = val
-
-    @cd0.setter
-    def cd0(self, val):
-        self._cd0 = val
 
     @AV.setter
     def AV(self, val):

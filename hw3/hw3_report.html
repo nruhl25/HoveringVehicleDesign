@@ -13128,7 +13128,7 @@ $$\theta(r)=0.75 \theta_{75}/r, \quad c_{l,\alpha}=2 \pi .$$<p>In this case, BEM
 $$\lambda = \frac{\sigma c_{l,\alpha}}{16} \left( \sqrt{1+\frac{32}{\sigma c_{l,\alpha}} 0.75 \theta_{75}} - 1 \right)$$<p>Therefore, the local and total coefficients of thrust and <strong>induced</strong> power can be written as:</p>
 $$c_T(r) = 4\lambda^2 r$$$$c_P(r) = 4\lambda^3 r$$$$C_T = 4 \lambda^2 \int_0^1 r dr = 2 \lambda^2 $$$$C_P = 4 \lambda^3 \int_0^1 r dr = 2 \lambda^3. $$<p>Using the notation of this report, the total power coefficient is</p>
 $$C_{P,tot} = C_P + C_{P,0}$$<p>where, in the linear regime, the total coefficient of profile power can be written as</p>
-$$C_{P,0}=\sigma \int_0^1 c_{d} r^3 dr = \frac{1}{8} \sigma c_{d,0}.$$<p>Lastly, we can write the local angle of attack of an airfoil as</p>
+$$C_{P,0}=\frac{\sigma}{2} \int_0^1 c_{d} r^3 dr = \frac{1}{8} \sigma c_{d,0}.$$<p>Lastly, we can write the local angle of attack of an airfoil as</p>
 $$\alpha(r) = \theta(r) - \phi(r)$$<p>where $\phi(r)$ is the induced inflow angle. In hover, the inflow angle can be written as:</p>
 $$\phi(r) = \frac{\lambda}{r}$$<p>.</p>
 <p>For completeness, recall the equation for the local airfoil coefficient of lift under linear aerodynamics:</p>
@@ -13534,7 +13534,7 @@ $$P_{ratio} = \frac{C_{P,0}}{C_{P,tot}}.$$
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Performance-as-a-Function-of-Input-Collective">Performance as a Function of Input Collective<a class="anchor-link" href="#Performance-as-a-Function-of-Input-Collective">&#182;</a></h4><p>The next step of the analysis is to calculate the total performance coefficients $C_T$ and $C_P$ as a function of input collective $\theta_{75}$. In order to better understand these plots, I wanted to approximate the maximum value for input collective, which I indicate with a red dashed line in the plots below. For the ideal twist distribution (with uniform inflow), the local airfoils on the rotor blade near the hub have the largest angles of attack, and are at risk of stalling (figure 4 above) when the input collective $\theta_{75}$ is too large. For this reason, I identified the approximate $\theta_{75}$ at which the local AoA at $r_{hub}=0.12$ is greater than $15^\circ$. Therefore, to the right of the red dashed lines in each plots below, there is a risk of stall at the base of the rotor blades. This also helps us better determine the maximum blade performance, especially since the performance coefficients will increase monotonically with input collective, as we will see.</p>
+<h4 id="Performance-as-a-Function-of-Input-Collective">Performance as a Function of Input Collective<a class="anchor-link" href="#Performance-as-a-Function-of-Input-Collective">&#182;</a></h4><p>The next step of the analysis is to calculate the total performance coefficients $C_T$ and $C_P$ as a function of input collective $\theta_{75}$. In order to better understand these plots, I wanted to approximate the maximum value for input collective, which I indicate with a red dashed line in the plots below. For the ideal twist distribution (with uniform inflow), the local airfoils on the rotor blade near the hub have the largest angles of attack, and are at risk of stalling (figure 4 above) when the input collective $\theta_{75}$ is too large. For this reason, I identified the approximate $\theta_{75}$ at which the local AoA at $r_{hub}=0.12$ is greater than $15^\circ$. Therefore, to the right of the red dashed lines in each plots below, there is a risk of stall at the base of the rotor blades. This also helps us better estimate the maximum blade performance, especially since the performance coefficients will increase monotonically with input collective, as we will see.</p>
 
 </div>
 </div>
@@ -13728,7 +13728,7 @@ $$P_{ratio} = \frac{C_{P,0}}{C_{P,tot}}.$$
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Plots of the total coefficient of power $C_{P,tot}$ and the ratio $C_{P,0}/C_P$ are shown below. As stated previously, the profile power contribution is importrant at smaller collectives, $\theta_{75}$.</p>
+<p>Plots of the total coefficient of power $C_{P,tot}$ and the ratio $C_{P,0}/C_P$ are shown below. As stated previously, the profile power contribution is very important, especially at smaller collectives, $\theta_{75}$.</p>
 
 </div>
 </div>
