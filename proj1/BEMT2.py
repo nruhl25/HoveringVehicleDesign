@@ -4,9 +4,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from gaussxw import gaussxwab
-from Rotor2 import Rotor2
-
 # Constants
 rho0 = 0.002378 # slug/ft^3
 
@@ -25,10 +22,10 @@ def Theta(r, rotor2):
 
 def Chord(r, rotor2):
     '''Linear chord variation as a function of r
-    INPUTS:
-    TR = taper ratio (eg -0.5 for 2:1)
-    c_75: chord at 75%R'''
-    chord = rotor2.chord_75+rotor2.TR*(r-0.75)
+    TR = taper ratio (eg 0.5 for 2:1)
+    chord_75: chord at 75%R'''
+    chord_base = rotor2.chord_75/((0.75/rotor2.TR)+0.25)
+    chord = chord_base*((1/rotor2.TR)-1)*r + chord_base
     return chord
 
 def Sigma(r, rotor2):
@@ -37,7 +34,7 @@ def Sigma(r, rotor2):
         return sigma
 
 def dCd(alpha, rotor2):
-    '''Blade section coefficient of drag as a function of AoA (NACA001D quadratic fit)'''
+    '''Blade section coefficient of drag as a function of AoA (NACA0012 quadratic fit)'''
     return rotor2.d[0] + rotor2.d[1]*alpha + rotor2.d[2]*alpha**2
 ####################
 

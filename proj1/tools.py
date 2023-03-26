@@ -25,7 +25,7 @@ def calc_rotor_profiles(rotor2, airfoil, use_F=False, rs=np.linspace(0.1, 0.99, 
         lambda_list = Lambda(rs, rotor2, F=1)
         dCT_list = dCT(rs, rotor2, F=1)
         dCPi_list = dCPi(rs, rotor2, F=1)
-        dCP0_list = dCP0_func(rs, rotor2, F=1)
+        dCP0_list = dCP0_func(rs, rotor2, Ff=1)
     elif use_F is True:
         # Using Prandtl tip loss, cannot make use of vectorization
         F_list = np.zeros(len(rs))

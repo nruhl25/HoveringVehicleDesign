@@ -82,7 +82,7 @@ def plot_prandtl_comparison(rotor2, airfoil, rs=np.linspace(0.1, 0.99, 100)):
     plt.plot(rs, dCT(rs, rotor2, F=1), label="No tip loss")
     plt.grid()
     plt.xlabel('r')
-    plt.ylabel(r'$c_T$')
+    plt.ylabel(r'$c_t$')
     plt.legend()
     plt.tight_layout()
 
@@ -92,7 +92,7 @@ def plot_prandtl_comparison(rotor2, airfoil, rs=np.linspace(0.1, 0.99, 100)):
     plt.plot(rs, dCPi(rs, rotor2, F=1), label="No tip loss")
     plt.grid()
     plt.xlabel('r')
-    plt.ylabel(r'$c_{P,i}$')
+    plt.ylabel(r'$c_{p,i}$')
     plt.legend()
     plt.show()
     return
@@ -143,6 +143,9 @@ def vary_propertyX_plot_profiles(rotor, propX, X_list, X_labels, airfoil="NACA00
         lambda_list, dCT_list, dCPi_list, dCP0_list, F_list = tools.calc_rotor_profiles(
             rotor, airfoil=airfoil, use_F=use_F, rs=rs)
         dCP_list = dCPi_list + dCP0_list
+        CT, CPi, CP0 = tools.calc_CT_CPi_CP0(rotor, airfoil=airfoil, use_F=use_F)
+        CP = CPi + CP0
+        p_ratio = CPi/CP0
 
         plt.subplot(1, 4, 1)
         plt.plot(rs, lambda_list,
@@ -150,15 +153,17 @@ def vary_propertyX_plot_profiles(rotor, propX, X_list, X_labels, airfoil="NACA00
 
         plt.subplot(1, 4, 2)
         plt.plot(rs, dCT_list,
-                 label=X_labels[i])
+                 label=X_labels[i]+fr", $C_T$={CT:.5f}")
 
         plt.subplot(1, 4, 3)
         plt.plot(rs, dCP_list,
-                 label=X_labels[i])
+                 label=X_labels[i]+fr", $C_P$={CP:.5f}")
         
         plt.subplot(1, 4, 4)
         plt.plot(rs, F_list,
                  label=X_labels[i])
+        
+        print(f"{X_labels[i]}: Ratio of induced power to profile power: C_Pi/C_P0={p_ratio:.3f}")
 
     plt.subplot(1, 4, 1)
     plt.title("Inflow Distribution")
@@ -170,14 +175,14 @@ def vary_propertyX_plot_profiles(rotor, propX, X_list, X_labels, airfoil="NACA00
     plt.subplot(1, 4, 2)
     plt.title("Section Thrust Distribution")
     plt.xlabel("Non-dimensional radial position, r")
-    plt.ylabel(r"Section thrust coefficient, $c_T$")
+    plt.ylabel(r"Section thrust coefficient, $c_t$")
     plt.legend()
     plt.grid()
 
     plt.subplot(1, 4, 3)
     plt.title("Section Power Distribution")
     plt.xlabel("Non-dimensional radial position, r")
-    plt.ylabel(r"Section power coefficient (total), $c_P$")
+    plt.ylabel(r"Section power coefficient (total), $c_p$")
     plt.legend()
     plt.grid()
 
@@ -186,11 +191,115 @@ def vary_propertyX_plot_profiles(rotor, propX, X_list, X_labels, airfoil="NACA00
     plt.xlabel("Non-dimensional radial position, r")
     plt.ylabel(r"Tip Loss, $F$")
     plt.legend()
-    plt.xlim([0.7,1.0])
+    plt.xlim([0.8,1.0])
     plt.grid()
 
     plt.tight_layout()
 
     plt.show()
     plt.rcParams['figure.figsize'] = [6.4, 4.8]   # default
+    return
+
+def compare_rotors(rotor_list):
+    rs = np.linspace(0.01, 0.99, 100)
+
+
+    CT_list = np.zeros(4)
+    CPi_list = np.zeros(4)
+    CP0_list = np.zeros(4)
+    CP_list = np.zeros(4)
+
+    plt.rcParams['figure.figsize'] = [14, 10]
+    fig, ax = plt.subplots(2, 3)
+    for i, rotor in enumerate(rotor_list):
+        j = i+1
+        lambda_list, dCT_list, dCPi_list, dCP0_list, F_list = tools.calc_rotor_profiles(
+            rotor, airfoil="NACA0012", use_F=True, rs=rs)
+        CT_list[i], CPi_list[i], CP0_list[i] = tools.calc_CT_CPi_CP0(
+            rotor, airfoil="NACA0012", use_F=True)
+        CP_list[i] = CPi_list[i] + CP0_list[i]
+
+        ax[0, 0].plot(rs, lambda_list, label=f"Rotor {j}")
+
+        ax[0, 1].plot(rs, dCT_list, label=fr"Rotor {j}: $C_T$={CT_list[i]:.6f}")
+
+        ax[0, 2].plot(rs, F_list, label=fr"Rotor {j}")
+
+        ax[1, 0].plot(
+            rs, dCPi_list, label=fr"Rotor {j}: $C_{{P_i}}$={CPi_list[i]:.6f}")
+
+        ax[1, 1].plot(
+            rs, dCP0_list, label=fr"Rotor {j}: $C_{{P_0}}$={CP0_list[i]:.6f}")
+
+        ax[1, 2].plot(rs, dCP0_list+dCPi_list,
+                    label=fr"Rotor {j}: $C_{{P}}$={CP_list[i]:.6f}")
+
+
+    ax[0, 0].set_title("Induced Inflow Ratio")
+    ax[0, 0].set_ylabel(r"$\lambda$")
+    ax[0, 0].set_xlabel("r")
+    ax[0, 0].grid()
+    ax[0, 0].legend()
+
+    ax[0, 1].set_title("Section Thrust Coefficient")
+    ax[0, 1].set_ylabel(r"$c_t$")
+    ax[0, 1].set_xlabel("r")
+    ax[0, 1].grid()
+    ax[0, 1].legend()
+
+    ax[0, 2].set_title("Prandtl Tip Loss")
+    ax[0, 2].set_ylabel(r"$F$")
+    ax[0, 2].set_xlabel("r")
+    ax[0, 2].grid()
+    ax[0, 2].legend()
+
+    ax[1, 0].set_title("Section Coefficient of Induced Power")
+    ax[1, 0].set_ylabel("$c_{p,i}$")
+    ax[1, 0].set_xlabel("r")
+    ax[1, 0].grid()
+    ax[1, 0].legend()
+
+    ax[1, 1].set_title("Section Coefficient of Profile Power")
+    ax[1, 1].set_ylabel("$c_{p_0}$")
+    ax[1, 1].set_xlabel("r")
+    ax[1, 1].grid()
+    ax[1, 1].legend()
+
+    ax[1, 2].set_title("Total Section Coefficient of Power")
+    ax[1, 2].set_ylabel("$c_{p_0}$")
+    ax[1, 2].set_xlabel("r")
+    ax[1, 2].grid()
+    ax[1, 2].legend()
+
+    plt.tight_layout()
+    plt.rcParams['figure.figsize'] = [6.4, 4.8]   # default
+    return
+
+def compare_aoas(rotor_list):
+    rs = np.linspace(0.01, 0.99, 100)
+
+    CT_list = np.zeros(4)
+    CPi_list = np.zeros(4)
+    CP0_list = np.zeros(4)
+    CP_list = np.zeros(4)
+
+    for i, rotor in enumerate(rotor_list):
+        j = i+1
+        lambda_list, dCT_list, dCPi_list, dCP0_list, F_list = tools.calc_rotor_profiles(
+            rotor, airfoil="NACA0012", use_F=True, rs=rs)
+        CT_list[i], CPi_list[i], CP0_list[i] = tools.calc_CT_CPi_CP0(
+            rotor, airfoil="NACA0012", use_F=True)
+        CP_list[i] = CPi_list[i] + CP0_list[i]
+
+        plt.figure(1)
+        plt.plot(rs, np.rad2deg(Alpha(
+            rs, rotor, F=F_list)), label=f"Rotor {j}")
+
+
+    plt.figure(1)
+    plt.title("Section Angle of Attack along rotor blade")
+    plt.xlabel("r")
+    plt.ylabel("Section Angle of Attack")
+    plt.grid()
+    plt.legend()
     return
