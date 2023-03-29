@@ -303,3 +303,40 @@ def compare_aoas(rotor_list):
     plt.grid()
     plt.legend()
     return
+
+def convergence_test(rotor):
+    N_list = np.linspace(100, 5000, 20, dtype=int)
+
+    CT_list = []
+    CPi_list = []
+    CP0_list = []
+    for N in N_list:
+        CT, CPi, CP0 = tools.calc_CT_CPi_CP0(
+            rotor, airfoil="GENERAL", use_F=True, N_int=N)
+        CT_list.append(CT)
+        CPi_list.append(CPi)
+        CP0_list.append(CP0)
+
+    plt.rcParams['figure.figsize'] = [14, 5]
+    plt.suptitle("Convergence Test For Numerical Integration")
+
+    plt.subplot(1, 3, 1)
+    plt.plot(N_list, CT_list, label=r"$C_T$")
+    plt.xlabel("Number of integration intervals")
+    plt.grid()
+    plt.legend()
+
+    plt.subplot(1, 3, 2)
+    plt.plot(N_list, CPi_list, label=r"$C_{P_i}$")
+    plt.xlabel("Number of integration intervals")
+    plt.grid()
+    plt.legend()
+
+    plt.subplot(1, 3, 3)
+    plt.plot(N_list, CP0_list, label=r"$C_{P_0}$")
+    plt.xlabel("Number of integration intervals")
+    plt.grid()
+    plt.legend()
+
+    plt.tight_layout()
+    return

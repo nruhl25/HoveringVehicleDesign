@@ -30,7 +30,7 @@ def Chord(r, rotor2):
 
 def Sigma(r, rotor2):
         '''Rotor solidity as a function of r changes because of taper'''
-        sigma = rotor2.Nb*Chord(r, rotor2)/(np.pi*rotor2.R)
+        sigma = rotor2.Nb*Chord(r, rotor2)/(np.pi*rotor2.R) 
         return sigma
 
 def dCd(alpha, rotor2):
