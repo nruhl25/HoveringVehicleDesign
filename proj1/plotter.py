@@ -20,38 +20,33 @@ def plot_rotor2(rotor2):
 
     plt.rcParams['figure.figsize'] = [14, 5]
 
-    plt.subplot(1, 4, 1)
+    plt.subplot(1, 3, 1)
     plt.title("Blade Twist")
     plt.ylabel(r"$\theta(r)$ (deg)")
     plt.xlabel("r")
     plt.plot(rs, np.rad2deg(Theta(rs, rotor2)))
     plt.grid()
 
-    plt.subplot(1, 4, 2)
+    plt.subplot(1, 3, 2)
     plt.title("Lift-Curve Slope")
     plt.ylabel(r"$c_{l,\alpha}(r)$")
     plt.xlabel("r")
     plt.plot(rs, Cl_slope(rs, rotor2))
     plt.grid()
 
-    plt.subplot(1, 4, 3)
+    plt.subplot(1, 3, 3)
     plt.title("Chord")
     plt.ylabel("c(r) (ft)")
     plt.xlabel("r")
-    plt.plot(rs, Chord(rs, rotor2))
+    plt.plot(rs, Chord(rs, rotor2),
+             label=rf"$\sigma_{{ave}}={Sigma(0, rotor2):.3f}$")
     plt.grid()
-
-    plt.subplot(1, 4, 4)
-    plt.title("Local Rotor Solidity")
-    plt.ylabel(r"$\sigma(r)$")
-    plt.xlabel("r")
-    plt.plot(rs, Sigma(rs, rotor2))
-    plt.grid()
+    plt.legend()
 
     plt.tight_layout()
     plt.show()
     print(
-        f"Other rotor2 properties: Nb={rotor2.Nb}, R={rotor2.R} ft, vtip = {rotor2.vtip} ft/sec, cd0={rotor2.cd0}")
+        f"Other rotor2 properties: Nb={rotor2.Nb}, R={rotor2.R} ft, vtip = {rotor2.vtip} ft/sec")
     plt.rcParams['figure.figsize'] = [6.4, 4.8]   # default
     return
 
@@ -163,7 +158,8 @@ def vary_propertyX_plot_profiles(rotor, propX, X_list, X_labels, airfoil="NACA00
         plt.plot(rs, F_list,
                  label=X_labels[i])
         
-        print(f"{X_labels[i]}: Ratio of induced power to profile power: C_Pi/C_P0={p_ratio:.3f}")
+        print(f"{X_labels[i]}: Power ratio: C_Pi/C_P0={p_ratio:.3f}, solidity = {Sigma(0,rotor):.3f}")
+
 
     plt.subplot(1, 4, 1)
     plt.title("Inflow Distribution")
@@ -252,6 +248,7 @@ def compare_rotors(rotor_list):
     ax[0, 2].set_xlabel("r")
     ax[0, 2].grid()
     ax[0, 2].legend()
+    ax[0, 2].set_xlim([0.7,1.0])
 
     ax[1, 0].set_title("Section Coefficient of Induced Power")
     ax[1, 0].set_ylabel("$c_{p,i}$")
@@ -266,7 +263,7 @@ def compare_rotors(rotor_list):
     ax[1, 1].legend()
 
     ax[1, 2].set_title("Total Section Coefficient of Power")
-    ax[1, 2].set_ylabel("$c_{p_0}$")
+    ax[1, 2].set_ylabel("$c_{p}$")
     ax[1, 2].set_xlabel("r")
     ax[1, 2].grid()
     ax[1, 2].legend()

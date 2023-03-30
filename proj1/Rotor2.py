@@ -10,7 +10,7 @@ class Rotor2:
         # Coefficient properties related to linear radial variations of airfoil cl_slope, theta twist, and chord
 
         self._theta_tw = -np.deg2rad(8)
-        self._theta_75 = np.deg2rad(12)
+        self._theta_75 = np.deg2rad(9)
 
         self._AV = 0
         self._cl_slope_75 = 2*np.pi
