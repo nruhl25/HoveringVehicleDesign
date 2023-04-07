@@ -29,7 +29,7 @@ alpha_list = (pi/180).*linspace(0.5,9.0,10);
 for i=1:length(alpha_list)
     alpha=alpha_list(i);
     [lambda(i), CT(i), theta_0(i), theta_1c(i), theta_1s(i)] = fCT_part1(alpha, v_inf, nu_b);
-    CX = CT.*vtip^2/(0.5*v_inf^2);
+    CX = CT.*vtip^2.*sin(alpha)/(0.5*v_inf^2);
 end
 
 % This function returns the relevant parameters when beta_1c=beta_1s=0 in
@@ -87,8 +87,6 @@ vars_to_solve = [CT lambda theta_0 theta_1c theta_1s];
 
 sol = solve(eqn_list{1}==0,eqn_list{2}==0,eqn_list{3}==0,eqn_list{4}==0,eqn_list{5}==0,vars_to_solve);
 disp(sol.lambda);
-disp(sol.CT);
-disp(sol.theta_1s);
 
 % return the average of the two correct-looking solutions
 lambda = 0.5*(sol.lambda(3)+sol.lambda(4));
