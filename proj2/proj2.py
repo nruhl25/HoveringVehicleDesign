@@ -22,9 +22,9 @@ rho = 1.225e3  # kg/m^3
 beta_1c = 0
 beta_1s = 0
 
-# initial guess of x for all iterations
+# initial guess of x for Newton iterations
 n_dim = 5
-x0 = np.array([0.01, 0.01, 0.01, 0.01, 0.01])
+x0 = np.array([-0.1, 0.0, 0.0, 0.0, 0.1])
 
 # Rotor disc angle alpha is unique for given CX and CT
 def calc_alpha(CX, CT, v_inf, nu_b):
@@ -103,7 +103,7 @@ def mps2knots(v_mps):
 def knots2mps(v_knots):
     return v_knots/1.94384
 
-
+# Main function to calculate trim as a function of CX and CT
 def calc_trims_array(CX_list, CT_list, v_inf, nu_b):
     trims = np.zeros((len(CX_list), len(CT_list), n_dim+1), dtype=float)
     for i in range(len(CX_list)):
