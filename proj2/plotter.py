@@ -40,8 +40,7 @@ def plot_trim_vary_velocity(v_inf_list, CX=0.05, nu_b=1.0):
     plt.rcParams['figure.figsize'] = [18, 12]
     plt.figure()
     state_var_list = ["beta_0", "theta_0",
-                        "theta_1c", "theta_1s", "lambda", "CQ"]
-    v_inf_list = np.linspace(knots2mps(20), knots2mps(33), 5)
+                        "theta_1c", "theta_1s", "lambda", "TP"]
     for indx, state_var in enumerate(state_var_list):
         plt.subplot(2, 3, indx+1)
         vary_flight_velocity(state_var, v_inf_list, CX, nu_b)
@@ -54,7 +53,7 @@ def plot_trim_vary_flap_frequency(nu_b_list, v_inf=knots2mps(25), CX=0.05):
     plt.rcParams['figure.figsize'] = [18, 12]
     plt.figure()
     state_var_list = ["beta_0", "theta_0",
-                      "theta_1c", "theta_1s", "lambda", "CQ"]
+                      "theta_1c", "theta_1s", "lambda", "TP"]
     for indx, state_var in enumerate(state_var_list):
         plt.subplot(2, 3, indx+1)
         vary_flap_frequency(state_var, nu_b_list, v_inf, CX)
@@ -71,7 +70,7 @@ def plot_rotor_disc_tilt(CX_list, CT_norm_list, v_inf, nu_b):
         alpha = calc_alpha(CX_list[i], CT_list, v_inf, nu_b)
         plt.plot(CT_norm_list, alpha, label=fr"$C_X$={CX_list[i]:.3f}")
     plt.grid()
-    plt.title(fr"Required rotor disc tilt to achieve desired forward thrust ($v_\infty$={mps2knots(v_inf):.2f}, $\nu_b=${nu_b:.3f})")
+    plt.title(fr"Required rotor rotor shaft incidence angle to achieve desired forward thrust ($v_\infty$={mps2knots(v_inf):.2f}, $\nu_b=${nu_b:.3f})")
     plt.xlabel(r"$C_T/\sigma$")
     plt.ylabel(r"Rotor Plane Tilt, $\alpha$ (deg)")
     plt.legend()
