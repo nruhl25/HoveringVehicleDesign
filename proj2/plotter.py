@@ -35,7 +35,7 @@ def vary_flap_frequency(state_to_plot, nu_b_list,v_inf=0.0, CX=0.05):
         plot_state_var(trim_tuple, state_to_plot, label_type="nu_b")
     return
 
-
+# I like the below workflow for plotting subfigures. Keep this in mind in the future.
 def plot_trim_vary_velocity(v_inf_list, CX=0.05, nu_b=1.0):
     plt.rcParams['figure.figsize'] = [18, 12]
     plt.figure()
@@ -62,16 +62,15 @@ def plot_trim_vary_flap_frequency(nu_b_list, v_inf=knots2mps(25), CX=0.05):
     return
 
 
-def plot_rotor_disc_tilt(CX_list, CT_norm_list, v_inf, nu_b):
-    CT_list = sigma*CT_norm_list
+def plot_rotor_disc_tilt(CX_list, CT_list, v_inf, nu_b):
     plt.rcParams['figure.figsize'] = [6.4, 4.8]
     for i in range(len(CX_list)):
         plt.figure(1)
         alpha = calc_alpha(CX_list[i], CT_list, v_inf, nu_b)
-        plt.plot(CT_norm_list, alpha, label=fr"$C_X$={CX_list[i]:.3f}")
+        plt.plot(CT_list/sigma, np.rad2deg(alpha), label=fr"$C_X$={CX_list[i]:.3f}")
     plt.grid()
     plt.title(fr"Required rotor rotor shaft incidence angle to achieve desired forward thrust ($v_\infty$={mps2knots(v_inf):.2f}, $\nu_b=${nu_b:.3f})")
     plt.xlabel(r"$C_T/\sigma$")
-    plt.ylabel(r"Rotor Plane Tilt, $\alpha$ (deg)")
+    plt.ylabel(r"Rotor Shaft Incidence Angle, $\alpha$ (deg)")
     plt.legend()
     return

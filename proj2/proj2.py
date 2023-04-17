@@ -90,7 +90,7 @@ def get_state_ylabel(state_var):
     elif state_var == "theta_1s":
         return r"Latitudianal Input, $\theta_{1s}$ (deg)"
     elif state_var == "lambda":
-        return r"Inflow Ratio, $\lambda$ (deg)"
+        return r"Inflow Ratio, $\lambda$"
     elif state_var == "TP":
         return r"Total Power, $P$ (hp)"
     else:
