@@ -13,7 +13,7 @@ d_copter = 7.75  # ft, diameter of helicopter
 A_copter = np.pi*(d_copter/2)**2
 
 nu_b = 1.0  # flapping frequency
-v_inf = 205  # ft/sec
+v_inf = 100  # ft/sec
 
 # Constants to choose
 L_emp = 2  # ft
@@ -96,10 +96,10 @@ def ffphi(x, W, Y, Lht, H, alpha):
 def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp):
     # Approximate CH to start off the algorithm
     H = Nb*cd0*R*(rho*A_blade*v_inf**2)
-    CH = H/(rho*A*R*vtip**2)
+    CH = H/(rho*A*vtip**2)
 
     # Step 1) Get CH to converge
-    for num_iter in range(500):
+    for num_iter in range(10):
         CH_last = CH
 
         # A) Solve for alpha, Lht
@@ -146,7 +146,7 @@ def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp):
         # F) Check if CH is consistent
         CH = (sigma*a/2)*(0.5*theta_0*mu*lmbda+0.25*theta_tw*mu*lmbda -
                         (1/6)*theta_1c*beta_0+0.25*theta_1s*mu*lmbda+cd0*mu/(2*a))
-        H = CH*(rho*A*R*vtip**2)
+        H = CH*(rho*A*vtip**2)
         if np.abs(CH-CH_last) < 1e-7:
             print(f"num_iter={num_iter}")
             break
@@ -156,7 +156,6 @@ def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp):
                         htr, Ttr, Lht, Y, Yf, Df, W, Mzr, alpha, phi)
     sol = fsolve(f3, np.ones(3))
     Mxf, Myf, Mzf = sol
-    print(Df+H*cos(alpha)-T*sin(alpha))
     sol_dict = {}
     sol_dict['beta_0'] = beta_0
     sol_dict['theta_0'] = theta_0
@@ -191,8 +190,8 @@ sol_dict = solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp)
 #     phi_list.append(np.rad2deg(sol_dict["phi"]))
 
 # import matplotlib.pyplot as plt
-# plt.plot(xcg_list, phi_list)
-# plt.ylabel(r"$\phi$ (deg)")
+# plt.plot(xcg_list, beta_0_list)
+# plt.ylabel(r"$\beta_0$ (deg)")
 # plt.xlabel(r"$x_{cg}$")
 # plt.show()
 
