@@ -5,6 +5,7 @@ import numpy as np
 from numpy import sin, cos
 from scipy.optimize import fsolve
 
+# Global variables
 rho = 0.002378  # slug/ft^3
 a = 2*np.pi  # cl_alpha
 gamma = 8  # Locke number
@@ -12,12 +13,10 @@ W = 14000+6000  # lbf, wieght of helicopter (wet weight)
 d_copter = 7.75  # ft, diameter of helicopter
 A_copter = np.pi*(d_copter/2)**2
 
-nu_b = 1.0  # flapping frequency
-v_inf = 100  # ft/sec
-
 # Constants to choose
 L_emp = 2  # ft
 c_emp = 0.5  # ft
+kappa = 1.15 # ideal power coefficient
 
 # Main rotor
 cd0 = 0.011  # section drag coefficient
@@ -37,16 +36,6 @@ R_tr = 5.5  # ft
 Omega_tr = 270  # rad/sec
 vtip_tr = Omega_tr*R_tr  # ft/sec
 Nb_tr = 4
-
-# Enforce rotor thrust and airframe drag
-# Thrust and disk-loading of UH-60
-DL = 9.33  # lbf/ft^2
-T = DL*A
-CT = T/(rho*A*vtip**2)
-
-# Estimate drag on airframe
-CD_sphere = 0.5
-Df = CD_sphere*A_copter*0.5*rho*v_inf**2
 
 ################################################
 
@@ -81,8 +70,7 @@ def ff3(x, xcg, ycg, hcg, xht, xtr, htr, Ttr, Lht, Y, Yf, Df, W, Mzr, alpha, phi
     f3[2] = Mzr + Mzf + Ttr*(xtr-xcg)-Df*cos(alpha)*ycg - Yf*xcg
     return f3
 
-
-def ffphi(x, W, Y, Lht, H, alpha):
+def ffphi(x, T, W, Y, Lht, H, alpha):
     phi, Ttr = x
     Yf = W*phi
     f = np.zeros(2)
@@ -93,19 +81,30 @@ def ffphi(x, W, Y, Lht, H, alpha):
 
 
 # Main equation for solving the trim
-def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp):
-    # Approximate CH to start off the algorithm
+def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp, v_inf, nu_b):
+
+    # Estimate drag on airframe
+    CD_sphere = 0.5
+    Df = CD_sphere*A_copter*0.5*rho*v_inf**2
+
+    # Assumption about thrust to start the iteration
+    T = W
+    CT = T/(rho*A*vtip**2)
+    CQ = (sigma*cd0/8)+kappa*CT**(3./2.)/np.sqrt(2.)
+
+    # Estimate rotor drag CH to start the iteration
     H = Nb*cd0*R*(rho*A_blade*v_inf**2)
     CH = H/(rho*A*vtip**2)
 
-    # Step 1) Get CH to converge
-    for num_iter in range(10):
+    # Step 1) Get CQ to converge by H changing
+    for num_iter in range(50):
         CH_last = CH
-
+        CT_last = CT
+        CQ_last = CQ
         # A) Solve for alpha, Lht
-        Ty = W    # ASSUMPTION
-        Tx = np.sqrt(T**2-Ty**2)
-        alpha = np.arccos((Tx-Df)/H)
+        # Ty = W    # ASSUMPTION
+        # Tx = np.sqrt(T**2-Ty**2)
+        alpha = (Df+H)/T
         Lht = 2*np.pi*(psi_emp-alpha)*L_emp*(rho*v_inf**2)*L_emp*c_emp
 
         # B) Solve mu and lmbda
@@ -123,48 +122,57 @@ def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp):
         # D) Define CQ, Mzr, CY, Y
         CQ = (sigma*a/2)*((lmbda*theta_0/3)+(lmbda/4)*theta_tw-(1/2)
                         * lmbda**2-(1/4)*(beta_0*mu)**2+(cd0/(4*a))*(1+mu**2))
+        CT_from_CQ = (np.sqrt(2)*(CQ-sigma*cd0/8)/kappa)**(2./3.)
         Mzr = -CQ*(rho*A*R*vtip**2)
         CY = (sigma*a/2)*(theta_0*(3/4)*mu*beta_0+theta_tw*(1/2)*mu*beta_0+theta_1c *
                         (1/4)*lmbda+theta_1s*(1/6)*beta_0*(1+3*mu**2)-(3/2)*mu*lmbda*beta_0)
         Y = CY*rho*A*vtip**2
 
-        # E) Solve for Ttr and phi
-        # phi = 0.1
-        # for i in range(2000):
-        #     phi_last = phi
-        #     Yf = W*phi
-        #     Ttr = Lht*phi - Yf - Y - T*phi
-        #     phi = (Ttr*psi_tr + T*cos(alpha) + H*sin(alpha) - Lht - W)/(Ttr-Y)
-        #     print(np.abs(phi-phi_last))
-        #     if (np.abs(phi-phi_last) < 1e-8):
-        #         break
-        def fphi(x): return ffphi(x, W, Y, Lht, H, alpha)
-        sol = fsolve(fphi, np.array([0.01, 1]))
-        phi, Ttr = sol
-        Yf = W*phi
-
-        # F) Check if CH is consistent
+        # F) Update H, T, Q
         CH = (sigma*a/2)*(0.5*theta_0*mu*lmbda+0.25*theta_tw*mu*lmbda -
                         (1/6)*theta_1c*beta_0+0.25*theta_1s*mu*lmbda+cd0*mu/(2*a))
+        # CH = growth_rate*CH_new + (1-growth_rate)*CH
         H = CH*(rho*A*vtip**2)
-        if np.abs(CH-CH_last) < 1e-7:
-            print(f"num_iter={num_iter}")
+        # T = CT*(rho*A*vtip**2)
+
+        print(f"alpha={np.rad2deg(alpha)}")
+        print(f"CH_last={CH_last}, CH={CH}")
+        print(f"CQ_last={CQ_last}, CQ={CQ}")
+        print(f"CT_last={CT_last}, CT={CT}")
+        print("----------------")
+
+        if (np.abs(CT-CT_from_CQ) and np.abs(CH-CH_last)) < 1e-9:
+            print(f"num_iter={num_iter+1}")
             break
 
-    # Step 2) Solve Moments Mxf, Myf, Mzf
+    # Step 2) Solve phi, Ttr
+    def fphi(x): return ffphi(x, T, W, Y, Lht, H, alpha)
+    sol = fsolve(fphi, np.array([0.01, 1]))
+    phi, Ttr = sol
+    Yf = W*phi
+
+    # Step 3) Solve Moments Mxf, Myf, Mzf
     def f3(x): return ff3(x, xcg, ycg, hcg, xht, xtr,
                         htr, Ttr, Lht, Y, Yf, Df, W, Mzr, alpha, phi)
     sol = fsolve(f3, np.ones(3))
     Mxf, Myf, Mzf = sol
+    print(f"--------------------")
+
+    # Creat solution output form
     sol_dict = {}
-    sol_dict['beta_0'] = beta_0
-    sol_dict['theta_0'] = theta_0
+    sol_dict['T'] = T
     sol_dict['alpha'] = alpha
     sol_dict["phi"] = phi
+    sol_dict['beta_0'] = beta_0
+    sol_dict['theta_0'] = theta_0
+    sol_dict['theta_1c'] = theta_1c
+    sol_dict['theta_1s'] = theta_1s
 
     return sol_dict
 
 #### INPUTS TO SOLVER PROCESS #####
+v_inf = 50 # ft/sec
+
 xcg = 0
 ycg = 0
 hcg = -3
@@ -173,25 +181,27 @@ xtr = 45
 htr = 3
 psi_tr = 0  # tail rotor angle
 psi_emp = 0  # empenage angle
+nu_b = 1
 
-sol_dict = solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp)
+sol_dict = solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp, v_inf, nu_b)
+print(sol_dict)
 
-# xcg_list = np.linspace(-1,1,20)
+# xcg_list = np.linspace(-5,5,20)
 # beta_0_list = []
 # theta_0_list = []
 # alpha_list = []
 # phi_list = []
 # for i in range(len(xcg_list)):
 #     print(f"xcg = {xcg_list[i]}")
-#     sol_dict = solve_trim_system(xcg_list[i], ycg, hcg, xht, xtr, htr, psi_tr, psi_emp)
+#     sol_dict = solve_trim_system(xcg_list[i], ycg, hcg, xht, xtr, htr, psi_tr, psi_emp, v_inf, nu_b)
 #     beta_0_list.append(np.rad2deg(sol_dict["beta_0"]))
 #     theta_0_list.append(np.rad2deg(sol_dict["theta_0"]))
 #     alpha_list.append(np.rad2deg(sol_dict["alpha"]))
 #     phi_list.append(np.rad2deg(sol_dict["phi"]))
 
 # import matplotlib.pyplot as plt
-# plt.plot(xcg_list, beta_0_list)
-# plt.ylabel(r"$\beta_0$ (deg)")
+# plt.plot(xcg_list, np.rad2deg(phi_list))
+# plt.ylabel(r"$\phi$ (deg)")
 # plt.xlabel(r"$x_{cg}$")
 # plt.show()
 
