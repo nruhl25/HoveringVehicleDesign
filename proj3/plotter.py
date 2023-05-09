@@ -17,7 +17,7 @@ def vary_xcg():
             test_list[i] = sol_dict[test_key]
         plt.subplot(2, 3, indx+1)
         plt.ticklabel_format(style='plain')
-        plt.plot(xcg_list, test_list)
+        plt.plot(xcg_list/np.max(xcg_list), test_list)
         plt.ylabel(f"{key_label}")
         plt.xlabel(r"$x_{cg}$ (ft)")
     plt.suptitle(
@@ -162,7 +162,7 @@ def vary_L_emp():
     plt.rcParams['figure.figsize'] = [12, 8]
     plt.figure()
     plt.title(
-        "Control Inputs and Blade Flapping When Varying Non-dimensional Flap Frequency")
+        "Control Inputs and Blade Flapping When Varying Empenage Size")
     for indx, (test_key, key_label) in enumerate(zip(key_list_fig1, key_label_list_fig1)):
         test_list = np.zeros(len(L_emp_list))
         for i in range(len(L_emp_list)):
@@ -173,7 +173,7 @@ def vary_L_emp():
         plt.ticklabel_format(style='plain')
         plt.plot(L_emp_list, test_list)
         plt.ylabel(f"{key_label}")
-        plt.xlabel(r"$\nu_\beta$ (ft)")
+        plt.xlabel(r"$L_{emp}$ (ft)")
     plt.tight_layout()
 
     plt.figure()
@@ -464,3 +464,5 @@ def vary_psi_emp():
 
     plt.show()
     return
+
+vary_L_emp()
