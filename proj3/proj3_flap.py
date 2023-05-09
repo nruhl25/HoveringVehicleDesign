@@ -197,12 +197,6 @@ def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp, v_inf, nu_b
     H = Nb*cd0*R*(rho*A_blade*v_inf**2)
     CH = H/(rho*A*vtip**2)
 
-    # Consumes 5% of main rotor power
-    # CQ_tr = 0.05*CQ*A*R*vtip**2/(A_tr*R_tr*vtip_tr**2)
-    # CT_tr = ((np.sqrt(2)/kappa_tr)*(CQ_tr-sigma_tr*cd0/8))**(2./3.)
-    # Ttr = CT_tr*rho*A_tr*vtip_tr**2
-    # P_tr = CQ_tr*rho*A_tr*R_tr*vtip_tr**2
-
     Y = 100 # initial guess
     for num_iter in range(20):
         Y_last = Y

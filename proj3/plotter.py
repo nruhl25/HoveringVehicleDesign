@@ -208,6 +208,57 @@ def vary_L_emp():
     plt.show()
     return
 
+def vary_xht():
+    xht_list = np.arange(14, 16, 0.1)
+    plt.rcParams['figure.figsize'] = [12, 8]
+    plt.figure()
+    plt.title(
+        "Control Inputs and Blade Flapping When Varying Longitudinal Empenage Position")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig1, key_label_list_fig1)):
+        test_list = np.zeros(len(xht_list))
+        for i in range(len(xht_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht_list[i], xtr, htr, psi_tr, psi_emp, v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 3, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(xht_list, test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$x_{ht}$ (ft)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.title(
+        "Control Inputs and Vehicale State When Varying Longitudinal Empenage Position")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig2, key_label_list_fig2)):
+        test_list = np.zeros(len(xht_list))
+        for i in range(len(xht_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht_list[i], xtr, htr, psi_tr, psi_emp, v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 2, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(xht_list, test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$x_{ht}$ (ft)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.rcParams['figure.figsize'] = [6, 4]
+    P_ratio_list = []
+    for i in range(len(xht_list)):
+        sol_dict = solve_trim_system(
+            xcg, ycg, hcg, xht_list[i], xtr, htr, psi_tr, psi_emp, v_inf, nu_b, L_emp)
+        P_ratio_list.append(sol_dict['P_tr']/sol_dict['P_mr'])
+
+    plt.plot(xht_list, P_ratio_list)
+    plt.ylabel(r"$P_{tr}/P_{mr}$")
+    plt.xlabel(r"$x_{ht}$ (ft)")
+    plt.title("Power of tail rotor vs Power of main rotor")
+
+    plt.show()
+    return
+
 
 def vary_nu_beta():
     nu_b_list = np.arange(1, 1.15, 0.01)
@@ -253,6 +304,110 @@ def vary_nu_beta():
     plt.plot(nu_b_list, P_ratio_list)
     plt.ylabel(r"$P_{tr}/P_{mr}$")
     plt.xlabel(r"$\nu_\beta$ (ft)")
+    plt.title("Power of tail rotor vs Power of main rotor")
+
+    plt.show()
+    return
+
+
+def vary_xtr():
+    xtr_list = np.linspace(38, 47, 20)
+    plt.rcParams['figure.figsize'] = [12, 8]
+    plt.figure()
+    plt.title(
+        "Control Inputs and Blade Flapping When Varying Longitudinal Tail Rotor Position")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig1, key_label_list_fig1)):
+        test_list = np.zeros(len(xtr_list))
+        for i in range(len(xtr_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht, xtr_list[i], htr, psi_tr, psi_emp, v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 3, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(xtr_list, test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$x_{tr}$ (ft)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.title(
+        "Control Inputs and Vehicale State When Varying Longitudinal Tail Rotor Position")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig2, key_label_list_fig2)):
+        test_list = np.zeros(len(xtr_list))
+        for i in range(len(xtr_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht, xtr_list[i], htr, psi_tr, psi_emp, v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 2, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(xtr_list, test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$x_{tr}$ (ft)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.rcParams['figure.figsize'] = [6, 4]
+    P_ratio_list = []
+    for i in range(len(xtr_list)):
+        sol_dict = solve_trim_system(
+            xcg, ycg, hcg, xht, xtr_list[i], htr, psi_tr, psi_emp, v_inf, nu_b, L_emp)
+        P_ratio_list.append(sol_dict['P_tr']/sol_dict['P_mr'])
+
+    plt.plot(xtr_list, P_ratio_list)
+    plt.ylabel(r"$P_{tr}/P_{mr}$")
+    plt.xlabel(r"$x_{tr}$ (ft)")
+    plt.title("Power of tail rotor vs Power of main rotor")
+
+    plt.show()
+    return
+
+
+def vary_htr():
+    htr_list = np.linspace(1, 5, 20)
+    plt.rcParams['figure.figsize'] = [12, 8]
+    plt.figure()
+    plt.title(
+        "Control Inputs and Blade Flapping When Varying Tail Rotor Vertical Position")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig1, key_label_list_fig1)):
+        test_list = np.zeros(len(htr_list))
+        for i in range(len(htr_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht, xtr, htr_list[i], psi_tr, psi_emp, v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 3, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(htr_list, test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$h_{tr}$ (ft)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.title(
+        "Control Inputs and Vehicale State When Varying Tail Rotor Vertical Position")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig2, key_label_list_fig2)):
+        test_list = np.zeros(len(htr_list))
+        for i in range(len(htr_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht, xtr, htr_list[i], psi_tr, psi_emp, v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 2, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(htr_list, test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$h_{tr}$ (ft)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.rcParams['figure.figsize'] = [6, 4]
+    P_ratio_list = []
+    for i in range(len(htr_list)):
+        sol_dict = solve_trim_system(
+            xcg, ycg, hcg, xht, xtr, htr_list[i], psi_tr, psi_emp, v_inf, nu_b, L_emp)
+        P_ratio_list.append(sol_dict['P_tr']/sol_dict['P_mr'])
+
+    plt.plot(htr_list, P_ratio_list)
+    plt.ylabel(r"$P_{tr}/P_{mr}$")
+    plt.xlabel(r"$h_{tr}$ (ft)")
     plt.title("Power of tail rotor vs Power of main rotor")
 
     plt.show()
