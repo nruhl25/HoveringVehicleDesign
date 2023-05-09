@@ -1,6 +1,5 @@
 # Author: Nathaniel Ruhl
 # MEAM5460: Project 3
-# FULL VERSION OF THE CODE
 
 import numpy as np
 from numpy import sin, cos, tan
@@ -45,8 +44,6 @@ kappa_tr = 1.25
 ################################################
 
 # Equation given in problem set
-
-
 def fCT(theta_0, theta_1s, mu, lmbda):
     CT = (sigma*a/2)*((theta_0/3)*(1+1.5*mu**2) + 0.25 *
                       theta_tw*(1+mu**2)+0.5*mu*theta_1s-0.5*lmbda)
@@ -58,15 +55,11 @@ def fCY(theta_0, theta_1c, theta_1s, beta_0, beta_1c, beta_1s, mu, lmbda):
                       theta_1s*((1/6)*beta_0*(1+3*mu**2)+0.5*mu*beta_1s)-(3/4)*lmbda*beta_1s+beta_0*beta_1c*((1/6)-mu**2)-(3/2)*mu*lmbda*beta_0-0.25*mu*beta_1c*beta_1s)
     return CY
 
-# Equation given in problem set
-
 
 def fCH(theta_0, theta_1c, theta_1s, beta_0, beta_1c, beta_1s, mu, lmbda):
     CH = (sigma*a/2)*(theta_0*(-beta_1c/3+0.5*mu*lmbda)+theta_tw*(-beta_1c/4+mu*lmbda/4) -
                       (1/6)*theta_1c*beta_0+theta_1s*(-0.25*beta_1c+0.25*mu*lmbda)-0.75*mu*lmbda*beta_1c+(1/6)*beta_0*beta_1s+0.25*mu*(beta_0**2+beta_1c**2)+cd0*mu/(2*a))
     return CH
-
-# Equation given in problem set
 
 
 def fCQ(theta_0, beta_0, beta_1c, beta_1s, mu, lmbda):
@@ -90,7 +83,6 @@ def ff1(lmbda, mu, alpha, CT):
 
 # Tail rotor trim function
 
-
 def ff_trim_tr(x, CT_tr, vtip_tr, psi_tr, v_inf):
     alpha, theta_0 = x
     # Pre-processing of inputs
@@ -105,7 +97,7 @@ def ff_trim_tr(x, CT_tr, vtip_tr, psi_tr, v_inf):
     f[1] = (8/3)*mu*theta_0+2*mu*theta_tw-2*mu*lmbda
     return f
 
-
+# Function to solve for phi, Ttr
 def ffphi(x, T, W, Lht, H, alpha, psi_tr):
     phi, Ttr = x
     Y = -Ttr
@@ -117,7 +109,7 @@ def ffphi(x, T, W, Lht, H, alpha, psi_tr):
     return f
 
 
-def ff2(x, xcg, ycg, hcg, xht, xtr, htr, Lht, Df, W, alpha, lmbda, mu, CT, CQ, CH, phi, nu_b):
+def ff2(x, xcg, ycg, hcg, xht, xtr, htr, Lht, Df, W, alpha, lmbda, mu, CT, CQ, CH, phi, nu_b, Ttr):
     theta_0, theta_1c, theta_1s, beta_0, beta_1c, beta_1s, Mxf, Myf, Mzf = x
     # Make assumption that phi is zero
     Yf = W*phi
@@ -126,11 +118,6 @@ def ff2(x, xcg, ycg, hcg, xht, xtr, htr, Lht, Df, W, alpha, lmbda, mu, CT, CQ, C
     CH_rhs = fCH(theta_0, theta_1c, theta_1s,
                  beta_0, beta_1c, beta_1s, mu, lmbda)
     CT_rhs = fCT(theta_0, theta_1s, mu, lmbda)
-
-    # Determine tail rotor thrust
-    CQ_tr = 0.05*CQ*A*R*vtip**2/(A_tr*R_tr*vtip_tr**2)
-    CT_tr = ((np.sqrt(2)/kappa)*(CQ_tr-sigma_tr*cd0/8))**(2./3.)
-    Ttr = CT_tr*rho*A_tr*vtip_tr**2
 
     CMx = fCMx(nu_b, beta_1s)
     CMy = fCMy(nu_b, beta_1c)
@@ -221,7 +208,7 @@ def solve_trim_system(xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp, v_inf, nu_b
 
         # Step 3) Solve everything else
         def f2(x): return ff2(x, xcg, ycg, hcg, xht, xtr, htr,
-                            Lht, Df, W, alpha, lmbda, mu, CT, CQ, CH, phi, nu_b)
+                            Lht, Df, W, alpha, lmbda, mu, CT, CQ, CH, phi, nu_b, Ttr)
         x0 = np.zeros(9)
         x0[0] = 1
         x0[6] = 0

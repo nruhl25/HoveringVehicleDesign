@@ -412,3 +412,55 @@ def vary_htr():
 
     plt.show()
     return
+
+
+def vary_psi_emp():
+    psi_emp_list = np.deg2rad(np.linspace(3, 12, 20))
+    plt.rcParams['figure.figsize'] = [12, 8]
+    plt.figure()
+    plt.title(
+        "Control Inputs and Blade Flapping When Varying Empenage Inclination Angle")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig1, key_label_list_fig1)):
+        test_list = np.zeros(len(psi_emp_list))
+        for i in range(len(psi_emp_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp_list[i], v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 3, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(np.rad2deg(psi_emp_list), test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$\psi_{emp}$ (deg)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.title(
+        "Control Inputs and Vehicale State When Varying Empanage Inclination Angle")
+    for indx, (test_key, key_label) in enumerate(zip(key_list_fig2, key_label_list_fig2)):
+        test_list = np.zeros(len(psi_emp_list))
+        for i in range(len(psi_emp_list)):
+            sol_dict = solve_trim_system(
+                xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp_list[i], v_inf, nu_b, L_emp)
+            test_list[i] = sol_dict[test_key]
+        plt.subplot(2, 2, indx+1)
+        plt.ticklabel_format(style='plain')
+        plt.plot(np.rad2deg(psi_emp_list), test_list)
+        plt.ylabel(f"{key_label}")
+        plt.xlabel(r"$\psi_{emp}$ (deg)")
+    plt.tight_layout()
+
+    plt.figure()
+    plt.rcParams['figure.figsize'] = [6, 4]
+    P_ratio_list = []
+    for i in range(len(psi_emp_list)):
+        sol_dict = solve_trim_system(
+            xcg, ycg, hcg, xht, xtr, htr, psi_tr, psi_emp_list[i], v_inf, nu_b, L_emp)
+        P_ratio_list.append(sol_dict['P_tr']/sol_dict['P_mr'])
+
+    plt.plot(np.rad2deg(psi_emp_list), P_ratio_list)
+    plt.ylabel(r"$P_{tr}/P_{mr}$")
+    plt.xlabel(r"$\psi_{emp}$ (deg)")
+    plt.title("Power of tail rotor vs Power of main rotor")
+
+    plt.show()
+    return
